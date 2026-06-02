@@ -6,9 +6,11 @@ import { ArrowLeft, Check, X, KeySquare, Plus, Trash2 } from 'lucide-react';
 import { motion } from 'motion/react';
 
 export function AdminPanel({ onBack }: { onBack: () => void }) {
-  const [tab, setTab] = useState<'submissions' | 'tasks' | 'keys'>('submissions');
+  const [tab, setTab] = useState<'submissions' | 'tasks' | 'keys' | 'recharges' | 'gmail'>('submissions');
   
   const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [recharges, setRecharges] = useState<any[]>([]);
+  const [gmailTasks, setGmailTasks] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
   const [keys, setKeys] = useState<{id: string, api_key: string}[]>([]);
@@ -23,12 +25,92 @@ export function AdminPanel({ onBack }: { onBack: () => void }) {
     reward: '5',
     task_type: 'fb-reels'
   });
+  const [newGmailTask, setNewGmailTask] = useState({
+    first_name: '',
+    last_name: '',
+    email_prefix: '',
+    password: '',
+    reward: '5'
+  });
 
   useEffect(() => {
     if (tab === 'submissions') loadSubmissions();
     if (tab === 'keys') loadKeys();
     if (tab === 'tasks') loadTasks();
+    if (tab === 'recharges') loadRecharges();
+    if (tab === 'gmail') loadGmailTasks();
   }, [tab]);
+
+  // --------------- Gmail Tasks Logic ---------------
+  const loadGmailTasks = async () => {
+    setLoading(true);
+    const { data } = await supabase.from('gmail_tasks').select('*').order('created_at', { ascending: false });
+    if (data) setGmailTasks(data);
+    setLoading(false);
+  };
+
+  const handleAddGmailTask = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const { data, error } = await supabase.from('gmail_tasks').insert({
+      first_name: newGmailTask.first_name,
+      last_name: newGmailTask.last_name,
+      email_prefix: newGmailTask.email_prefix,
+      password: newGmailTask.password,
+      reward: Number(newGmailTask.reward),
+      status: 'available'
+    }).select();
+    
+    if (data && data[0]) {
+      setGmailTasks([data[0], ...gmailTasks]);
+      setNewGmailTask({ first_name: '', last_name: '', email_prefix: '', password: '', reward: '5' });
+    }
+  };
+
+  const handleDeleteGmailTask = async (id: string) => {
+    await supabase.from('gmail_tasks').delete().eq('id', id);
+    setGmailTasks(gmailTasks.filter(t => t.id !== id));
+  };
+  
+  const handleApproveGmailTask = async (id: string, userId: string, reward: number) => {
+    // Approve task
+    await supabase.from('gmail_tasks').update({ status: 'approved' }).eq('id', id);
+    
+    // Add reward to user
+    const { data: userData } = await supabase.from('users').select('balance').eq('id', userId).single();
+    if (userData) {
+      await supabase.from('users').update({ balance: userData.balance + reward }).eq('id', userId);
+    }
+    
+    setGmailTasks(gmailTasks.map(t => t.id === id ? { ...t, status: 'approved' } : t));
+  };
+
+  const handleRejectGmailTask = async (id: string) => {
+    // Instead of rejecting completely, just make it available again
+    await supabase.from('gmail_tasks').update({ status: 'available', locked_by: null, locked_at: null }).eq('id', id);
+    setGmailTasks(gmailTasks.map(t => t.id === id ? { ...t, status: 'available', locked_by: null, locked_at: null } : t));
+  };
+
+  // --------------- Recharges Logic ---------------
+  const loadRecharges = async () => {
+    setLoading(true);
+    const { data } = await supabase
+      .from('recharges')
+      .select('*')
+      .eq('status', 'pending')
+      .order('created_at', { ascending: false });
+    
+    if (data) setRecharges(data);
+    setLoading(false);
+  };
+
+  const handleRechargeAction = async (id: string, action: 'approved' | 'rejected', amount: number, userId: string) => {
+    // If approved, we need to deduct the balance or do whatever.
+    // Actually wait, for recharge, user pays us on bKash directly, so their balance in app is unaffected.
+    // Or do they use their app balance? "Recivee Number,  Oparetor, Amount Diye contiune, Then Paynent kore TRx ID dibe then" - if they pay on bKash, their app balance isn't deducted.
+    // So we just update the status!
+    await supabase.from('recharges').update({ status: action }).eq('id', id);
+    setRecharges(recharges.filter(r => r.id !== id));
+  };
 
   // --------------- Submissions Logic ---------------
   const loadSubmissions = async () => {
@@ -136,24 +218,36 @@ export function AdminPanel({ onBack }: { onBack: () => void }) {
       <div className="max-w-md mx-auto p-4 space-y-6">
         
         {/* Tabs */}
-        <div className="flex gap-2">
+        <div className="grid grid-cols-5 gap-1 bg-slate-100 p-1 rounded-2xl mb-4">
           <button 
             onClick={() => setTab('submissions')}
-            className={`flex-1 py-2 px-3 text-sm font-medium rounded-xl transition-all ${tab === 'submissions' ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-600 hover:bg-slate-300'}`}
+            className={`py-2 px-1 text-[10px] sm:text-xs font-bold rounded-xl transition-all text-center ${tab === 'submissions' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
           >
-            Pending
+            Proofs
+          </button>
+          <button 
+            onClick={() => setTab('recharges')}
+            className={`py-2 px-1 text-[10px] sm:text-xs font-bold rounded-xl transition-all text-center ${tab === 'recharges' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+          >
+            Recharges
+          </button>
+          <button 
+            onClick={() => setTab('gmail')}
+            className={`py-2 px-1 text-[10px] sm:text-xs font-bold rounded-xl transition-all text-center ${tab === 'gmail' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+          >
+            Gmail
           </button>
           <button 
             onClick={() => setTab('tasks')}
-            className={`flex-1 py-2 px-3 text-sm font-medium rounded-xl transition-all ${tab === 'tasks' ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-600 hover:bg-slate-300'}`}
+            className={`py-2 px-1 text-[10px] sm:text-xs font-bold rounded-xl transition-all text-center ${tab === 'tasks' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
           >
             Tasks
           </button>
           <button 
             onClick={() => setTab('keys')}
-            className={`flex-1 py-2 px-3 text-sm font-medium rounded-xl transition-all ${tab === 'keys' ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-600 hover:bg-slate-300'}`}
+            className={`py-2 px-1 text-[10px] sm:text-xs font-bold rounded-xl transition-all text-center ${tab === 'keys' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
           >
-            ImgBB Keys
+            Keys
           </button>
         </div>
 
@@ -186,6 +280,133 @@ export function AdminPanel({ onBack }: { onBack: () => void }) {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Recharges Tab */}
+        {tab === 'recharges' && (
+          <div className="space-y-4">
+            <h2 className="text-lg font-bold text-slate-800">Pending Recharges</h2>
+            {loading ? <p className="text-slate-500">Loading...</p> : recharges.length === 0 ? <p className="text-slate-500">No pending recharges.</p> : recharges.map(rec => (
+              <div key={rec.id} className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-3">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-bold text-slate-800 text-lg">{rec.offer_details || 'Regular Top-Up'}</h3>
+                    <p className="text-sm font-black text-indigo-600">Amount: ৳{rec.amount}</p>
+                  </div>
+                  <span className="text-xs text-slate-400">{new Date(rec.created_at).toLocaleDateString()}</span>
+                </div>
+                
+                <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 text-sm space-y-2">
+                  <p><span className="text-slate-500 font-medium">Phone:</span> <span className="font-bold">{rec.phone_number}</span></p>
+                  <p><span className="text-slate-500 font-medium">Operator:</span> <span className="font-bold uppercase">{rec.operator}</span></p>
+                  <div className="pt-2 border-t border-slate-200">
+                    <span className="text-slate-500 font-medium block mb-1">bKash/Nagad TrxID:</span> 
+                    <span className="font-mono bg-indigo-50 text-indigo-700 p-2 rounded block break-all font-bold border border-indigo-100">
+                      {rec.trx_id}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex gap-2 pt-2">
+                  <button 
+                    onClick={() => handleRechargeAction(rec.id, 'approved', rec.amount, rec.user_id)}
+                    className="flex-1 bg-emerald-100 text-emerald-700 py-2.5 rounded-lg flex items-center justify-center gap-2 hover:bg-emerald-200 font-bold transition-colors"
+                  >
+                    <Check size={18} /> Approve
+                  </button>
+                  <button 
+                    onClick={() => handleRechargeAction(rec.id, 'rejected', rec.amount, rec.user_id)}
+                    className="flex-1 bg-red-100 text-red-700 py-2.5 rounded-lg flex items-center justify-center gap-2 hover:bg-red-200 font-bold transition-colors"
+                  >
+                    <X size={18} /> Reject
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Gmail Tasks Tab */}
+        {tab === 'gmail' && (
+          <div className="space-y-6">
+            <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+              <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <Plus size={20} className="text-indigo-600" /> Add Gmail Task
+              </h2>
+              <form onSubmit={handleAddGmailTask} className="space-y-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-slate-500 mb-1">First Name</label>
+                    <input required type="text" value={newGmailTask.first_name} onChange={e => setNewGmailTask({...newGmailTask, first_name: e.target.value})} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm" placeholder="John" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-500 mb-1">Last Name</label>
+                    <input required type="text" value={newGmailTask.last_name} onChange={e => setNewGmailTask({...newGmailTask, last_name: e.target.value})} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm" placeholder="Doe" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-500 mb-1">Email Prefix</label>
+                  <input required type="text" value={newGmailTask.email_prefix} onChange={e => setNewGmailTask({...newGmailTask, email_prefix: e.target.value})} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm" placeholder="johndoe123" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-500 mb-1">Password</label>
+                  <input required type="text" value={newGmailTask.password} onChange={e => setNewGmailTask({...newGmailTask, password: e.target.value})} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm" placeholder="StrongPass123!" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-500 mb-1">Reward (BDT)</label>
+                  <input required type="number" step="0.1" value={newGmailTask.reward} onChange={e => setNewGmailTask({...newGmailTask, reward: e.target.value})} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm" />
+                </div>
+                <button type="submit" className="w-full bg-indigo-600 text-white font-medium py-2.5 rounded-xl hover:bg-indigo-700 transition-colors">
+                  Add Gmail Task
+                </button>
+              </form>
+            </div>
+
+            <div className="space-y-4">
+              <h2 className="text-lg font-bold text-slate-800">Gmail Tasks</h2>
+              {loading ? <p className="text-slate-500">Loading...</p> : gmailTasks.length === 0 ? <p className="text-slate-500">No gmail tasks.</p> : gmailTasks.map(task => (
+                <div key={task.id} className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col gap-3">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-bold text-slate-800">{task.first_name} {task.last_name}</h3>
+                      <p className="text-sm text-slate-500">{task.email_prefix}@gmail.com</p>
+                      <p className="text-xs font-mono text-slate-400 mt-1">Pass: {task.password}</p>
+                    </div>
+                    <div className="flex flex-col items-end gap-2">
+                       <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${
+                          task.status === 'available' ? 'bg-emerald-100 text-emerald-700' :
+                          task.status === 'locked' ? 'bg-amber-100 text-amber-700' :
+                          task.status === 'submitted' ? 'bg-blue-100 text-blue-700' :
+                          'bg-slate-100 text-slate-700'
+                       }`}>
+                         {task.status}
+                       </span>
+                       <button onClick={() => handleDeleteGmailTask(task.id)} className="text-red-500 p-1 hover:bg-red-50 rounded">
+                         <Trash2 size={16} />
+                       </button>
+                    </div>
+                  </div>
+                  
+                  {task.status === 'submitted' && task.locked_by && (
+                    <div className="flex gap-2 pt-2 border-t border-slate-100">
+                      <button 
+                        onClick={() => handleApproveGmailTask(task.id, task.locked_by, task.reward)}
+                        className="flex-1 bg-emerald-100 text-emerald-700 py-1.5 rounded-lg text-sm font-bold hover:bg-emerald-200 transition-colors"
+                      >
+                        Approve
+                      </button>
+                      <button 
+                        onClick={() => handleRejectGmailTask(task.id)}
+                        className="flex-1 bg-red-100 text-red-700 py-1.5 rounded-lg text-sm font-bold hover:bg-red-200 transition-colors"
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
