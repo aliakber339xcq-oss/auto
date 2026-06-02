@@ -129,6 +129,7 @@ CREATE TABLE IF NOT EXISTS site_settings (
 );
 
 ALTER TABLE site_settings DISABLE ROW LEVEL SECURITY;
+ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS global_notice TEXT;
 
 INSERT INTO site_settings (popup_enabled, popup_text, tutorial_url, review_url, telegram_url, global_notice)
 SELECT false, 'Welcome to BDPay!', 'https://youtube.com', 'https://play.google.com', 'https://t.me', ''
