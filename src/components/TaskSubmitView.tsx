@@ -4,7 +4,7 @@ import { TaskItem, User } from '../types';
 import { ArrowLeft, Upload, CheckCircle2, Image as ImageIcon, ExternalLink, Loader2 } from 'lucide-react';
 import { motion } from 'motion/react';
 
-export function TaskSubmitView({ task, user, onBack }: { task: TaskItem, user: User, onBack: () => void }) {
+export function TaskSubmitView({ task, user, onBack, onSuccess }: { task: TaskItem, user: User, onBack: () => void, onSuccess?: () => void }) {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -95,7 +95,7 @@ export function TaskSubmitView({ task, user, onBack }: { task: TaskItem, user: U
         <h2 className="text-2xl font-bold text-slate-800 mb-2">Submitted Successfully!</h2>
         <p className="text-slate-500 mb-8">Your proof has been submitted and is pending admin approval.</p>
         <button 
-          onClick={onBack}
+          onClick={onSuccess || onBack}
           className="w-full bg-slate-100 text-slate-700 py-3 rounded-xl font-medium hover:bg-slate-200 transition-colors"
         >
           Back to Tasks

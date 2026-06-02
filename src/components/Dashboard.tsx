@@ -26,6 +26,29 @@ export function Dashboard({ user, onLogout, setUser }: DashboardProps) {
   const isAdmin = user.gmail === 'admin@gmail.com';
 
   useEffect(() => {
+    const refreshUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      if (data?.user) {
+        const metadata = data.user.user_metadata || {};
+        // Make sure we correctly update streak and balance
+        const updatedUser: User = {
+          ...user,
+          balance: metadata.balance ?? user.balance,
+          streak: metadata.streak ?? user.streak,
+          lastCheckIn: metadata.lastCheckIn ?? user.lastCheckIn,
+        };
+        // Update local state if there are changes
+        if (updatedUser.balance !== user.balance || updatedUser.streak !== user.streak || updatedUser.lastCheckIn !== user.lastCheckIn) {
+           setUser(updatedUser);
+           localStorage.setItem('bdpay_user', JSON.stringify(updatedUser));
+           localStorage.setItem('bdpay_registered_user_data', JSON.stringify(updatedUser));
+        }
+      }
+    };
+    refreshUser();
+  }, [activeTab]);
+
+  useEffect(() => {
     if (user.lastCheckIn) {
       const lastCheckInDate = new Date(user.lastCheckIn).toDateString();
       const todayDate = new Date().toDateString();

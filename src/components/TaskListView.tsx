@@ -52,7 +52,17 @@ export function TaskListView({ taskType, categoryTitle, user, onBack }: TaskList
   };
 
   if (selectedTask) {
-    return <TaskSubmitView task={selectedTask} user={user} onBack={() => setSelectedTask(null)} />;
+    return (
+      <TaskSubmitView 
+        task={selectedTask} 
+        user={user} 
+        onBack={() => setSelectedTask(null)}
+        onSuccess={() => {
+          loadTasks();
+          setSelectedTask(null);
+        }}
+      />
+    );
   }
 
   return (
