@@ -1,7 +1,7 @@
 import { User } from '../types';
 import { TASK_LIST } from '../data';
 import { motion, AnimatePresence } from 'motion/react';
-import { LogOut, Wallet, Flame, CheckCircle2, ChevronRight, Menu, Home, Clock, Coins, User as UserIcon, ShieldAlert, X, HelpCircle, Info, Star, Bell } from 'lucide-react';
+import { LogOut, Wallet, Flame, CheckCircle2, ChevronRight, Menu, Home, Clock, Coins, User as UserIcon, ShieldAlert, X, HelpCircle, Info, Star, Bell, Gift } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { TaskListView } from './TaskListView';
@@ -10,6 +10,7 @@ import { HistoryView } from './HistoryView';
 import { SiteAgeCounter } from './SiteAgeCounter';
 import { RechargeView } from './RechargeView';
 import { GmailTaskView } from './GmailTaskView';
+import { ReferralView } from './ReferralView';
 
 interface DashboardProps {
   user: User;
@@ -26,6 +27,7 @@ export function Dashboard({ user, onLogout, setUser }: DashboardProps) {
   const [activeTaskCategory, setActiveTaskCategory] = useState<string | null>(null);
   const [activeTaskTitle, setActiveTaskTitle] = useState('');
   const [isRecharging, setIsRecharging] = useState(false);
+  const [showReferral, setShowReferral] = useState(false);
   const [isGmailView, setIsGmailView] = useState(false);
 
   const [notifications, setNotifications] = useState<any[]>([]);
@@ -59,7 +61,7 @@ export function Dashboard({ user, onLogout, setUser }: DashboardProps) {
       
       const notifs: any[] = [];
       if (subs) {
-        notifs.push(...subs.map(s => ({ id: `task-${s.id}`, type: 'Task', title: s.tasks?.title || 'Task', status: s.status, updated_at: s.updated_at, is_read: true })));
+        notifs.push(...subs.map(s => ({ id: `task-${s.id}`, type: 'Task', title: Array.isArray(s.tasks) ? s.tasks[0]?.title : (s.tasks as any)?.title || 'Task', status: s.status, updated_at: s.updated_at, is_read: true })));
       }
       if (recs) {
         notifs.push(...recs.map(r => ({ id: `rec-${r.id}`, type: 'Recharge', title: r.offer_details || 'Top Up', status: r.status, updated_at: r.updated_at, is_read: true })));
@@ -76,6 +78,9 @@ export function Dashboard({ user, onLogout, setUser }: DashboardProps) {
     fetchNotifications();
 
     const refreshUser = async () => {
+      // Ensure profile and process referral
+      await supabase.rpc('ensure_user_profile', { p_ref_code: user.referralCode || null });
+
       const { data } = await supabase.auth.getUser();
       if (data?.user) {
         const metadata = data.user.user_metadata || {};
@@ -211,6 +216,10 @@ export function Dashboard({ user, onLogout, setUser }: DashboardProps) {
 
   if (isRecharging) {
     return <RechargeView user={user} onBack={() => setIsRecharging(false)} />;
+  }
+
+  if (showReferral) {
+    return <ReferralView user={user} onBack={() => setShowReferral(false)} />;
   }
 
   if (isGmailView) {
@@ -654,12 +663,20 @@ export function Dashboard({ user, onLogout, setUser }: DashboardProps) {
                 </div>
                 {user.referralCode && (
                   <div className="flex justify-between">
-                    <span className="text-slate-500">Ref Code</span>
+                    <span className="text-slate-500">Referred By</span>
                     <span className="font-medium text-slate-800">{user.referralCode}</span>
                   </div>
                 )}
               </div>
             </div>
+
+            <button 
+              onClick={() => setShowReferral(true)}
+              className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-md"
+            >
+              <Gift size={20} />
+              Refer & Earn Extra
+            </button>
 
             {isAdmin && (
               <button 
