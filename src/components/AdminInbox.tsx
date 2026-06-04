@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
-import { User, MessageSquare, Send, Image as ImageIcon, ChevronLeft, Bot } from 'lucide-react';
+import { User, MessageSquare, Send, Image as ImageIcon, ChevronLeft, Bot, EyeOff, Archive } from 'lucide-react';
 import { motion } from 'motion/react';
 
 export function AdminInbox() {
@@ -10,6 +10,24 @@ export function AdminInbox() {
   const [text, setText] = useState('');
   const [uploading, setUploading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const [hiddenChats, setHiddenChats] = useState<Record<string, string>>(() => {
+    const saved = localStorage.getItem('admin_hidden_chats');
+    return saved ? JSON.parse(saved) : {};
+  });
+  
+  const [archivedChats, setArchivedChats] = useState<string[]>(() => {
+    const saved = localStorage.getItem('admin_archived_chats');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('admin_hidden_chats', JSON.stringify(hiddenChats));
+  }, [hiddenChats]);
+
+  useEffect(() => {
+    localStorage.setItem('admin_archived_chats', JSON.stringify(archivedChats));
+  }, [archivedChats]);
 
   useEffect(() => {
     loadConversations();
@@ -88,8 +106,33 @@ export function AdminInbox() {
       image_url: imageUrl || null
     });
     
+    // Automatically unhide if admin replies (optional, we could also just leave it unhidden since it's active)
     loadConversations();
   };
+
+  const handleHide = (e: React.MouseEvent, userId: string) => {
+    e.stopPropagation();
+    setHiddenChats(prev => ({ ...prev, [userId]: new Date().toISOString() }));
+  };
+
+  const handleArchive = (e: React.MouseEvent, userId: string) => {
+    e.stopPropagation();
+    if (window.confirm('আপনি কি নিশ্চিত যে আপনি এই চ্যাটটি আর্কাইভ করতে চান? তারা আবার মেসেজ দিলেও এটি আর ইনবক্সে আসবে না।')) {
+      setArchivedChats(prev => [...prev, userId]);
+    }
+  };
+
+  const visibleConversations = conversations.filter(conv => {
+    if (archivedChats.includes(conv.user_id)) return false;
+    if (hiddenChats[conv.user_id]) {
+      const hideTime = new Date(hiddenChats[conv.user_id]).getTime();
+      const messageTime = new Date(conv.last_time).getTime();
+      if (messageTime <= hideTime) {
+        return false;
+      }
+    }
+    return true;
+  });
 
   if (!activeUserId) {
     return (
@@ -99,18 +142,18 @@ export function AdminInbox() {
            User Inboxes
         </h3>
         
-        {conversations.length === 0 ? (
+        {visibleConversations.length === 0 ? (
           <div className="text-center py-12 px-4 rounded-2xl bg-slate-50 text-slate-500 text-sm border border-dashed border-slate-200">
             <MessageSquare size={24} className="mx-auto mb-2 text-slate-300" />
             No incoming messages yet
           </div>
         ) : (
           <div className="space-y-3">
-            {conversations.map(conv => (
+            {visibleConversations.map(conv => (
               <button 
                 key={conv.user_id}
                 onClick={() => setActiveUserId(conv.user_id)}
-                className="w-full text-left p-4 rounded-2xl border border-slate-100 bg-slate-50/50 hover:bg-indigo-50/50 hover:border-indigo-100 transition-all flex items-center gap-4 group shadow-sm hover:shadow"
+                className="w-full text-left p-4 rounded-2xl border border-slate-100 bg-slate-50/50 hover:bg-indigo-50/50 hover:border-indigo-100 transition-all flex items-center gap-4 group shadow-sm hover:shadow relative"
               >
                 <div className="relative">
                   <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-2xl shadow-inner flex items-center justify-center font-black tracking-widest text-sm uppercase group-hover:scale-105 transition-transform">
@@ -120,15 +163,35 @@ export function AdminInbox() {
                 </div>
                 <div className="flex-1 overflow-hidden">
                   <div className="flex justify-between items-start mb-1">
-                    <h4 className="font-bold text-slate-800 text-sm truncate">{conv.name}</h4>
-                    <span className="text-[10px] font-medium text-slate-400 whitespace-nowrap ml-2">
-                       {new Date(conv.last_time).toLocaleDateString([], { month: 'short', day: 'numeric' })}
-                    </span>
+                    <h4 className="font-bold text-slate-800 text-sm truncate pr-20">{conv.name}</h4>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold bg-slate-200 px-1.5 py-0.5 rounded-md text-slate-600">{conv.number}</span>
+                  <div className="flex items-center gap-2 pr-16">
+                    <span className="text-[10px] font-bold bg-slate-200 px-1.5 py-0.5 rounded-md text-slate-600 shrink-0">{conv.number}</span>
                     <p className="text-xs text-slate-500 truncate flex-1">{conv.last_message}</p>
                   </div>
+                </div>
+
+                {/* Actions */}
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-1 items-end">
+                   <span className="text-[10px] font-medium text-slate-400 whitespace-nowrap mb-1">
+                      {new Date(conv.last_time).toLocaleDateString([], { month: 'short', day: 'numeric' })}
+                   </span>
+                   <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                     <div 
+                       onClick={(e) => handleHide(e, conv.user_id)}
+                       className="p-1.5 bg-slate-200 text-slate-600 rounded-lg hover:bg-amber-100 hover:text-amber-600 transition-colors"
+                       title="Hide until new message"
+                     >
+                       <EyeOff size={14} />
+                     </div>
+                     <div 
+                       onClick={(e) => handleArchive(e, conv.user_id)}
+                       className="p-1.5 bg-slate-200 text-slate-600 rounded-lg hover:bg-red-100 hover:text-red-600 transition-colors"
+                       title="Archive permanently"
+                     >
+                       <Archive size={14} />
+                     </div>
+                   </div>
                 </div>
               </button>
             ))}

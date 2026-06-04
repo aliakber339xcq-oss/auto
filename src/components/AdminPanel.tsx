@@ -322,7 +322,7 @@ export function AdminPanel({ onBack }: { onBack: () => void }) {
 
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="pb-8">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 z-50 bg-slate-50 overflow-y-auto h-[100dvh]">
       <div className="bg-slate-800 px-4 py-4 sticky top-0 z-20 shadow-sm flex items-center justify-between text-white">
         <div className="flex items-center gap-3">
           <button onClick={onBack} className="p-2 hover:bg-white/10 rounded-lg transition-colors">
