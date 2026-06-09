@@ -757,16 +757,11 @@ export function AdminPanel({ onBack }: { onBack: () => void }) {
                           'bg-slate-300'
                        }`}></div>
                        <div>
-                         <span className="font-bold text-slate-700 capitalize tracking-wide">
-                           {task.status} User Task
+                         <span className="font-bold text-slate-700 capitalize tracking-wide flex items-center gap-2">
+                           {task.first_name} {task.last_name}
+                           <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-500">{task.status}</span>
                          </span>
-                         {task.status === 'locked' ? (
-                           <p className="text-[11px] text-slate-400 font-medium">Currently locked by a user</p>
-                         ) : task.status === 'available' ? (
-                           <p className="text-[11px] text-slate-400 font-medium tracking-wide">Ready for users to complete</p>
-                         ) : task.status === 'submitted' ? (
-                           <p className="text-[11px] text-blue-500 font-bold tracking-wide">Pending review</p>
-                         ) : null}
+                         <p className="text-[12px] text-slate-500 font-medium">{task.email_prefix}@gmail.com <span className="mx-1">•</span> <span className="font-mono text-slate-400">Pass: {task.password}</span></p>
                        </div>
                     </div>
                     <div className="flex items-center gap-2">
