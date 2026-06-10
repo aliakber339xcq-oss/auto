@@ -1,7 +1,7 @@
 import { User } from '../types';
 import { TASK_LIST } from '../data';
 import { motion, AnimatePresence } from 'motion/react';
-import { LogOut, Wallet, Flame, CheckCircle2, ChevronRight, Menu, Home, Clock, Coins, User as UserIcon, ShieldAlert, X, HelpCircle, Info, Star, Bell, Gift, Send, Crown, Mail, Calendar } from 'lucide-react';
+import { LogOut, Wallet, Flame, CheckCircle2, ChevronRight, Menu, Home, Clock, Coins, User as UserIcon, ShieldAlert, X, HelpCircle, Info, Star, Bell, Gift, Send, Crown, Mail, Calendar, Video } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { TaskListView } from './TaskListView';
