@@ -15,6 +15,7 @@ export function HistoryView({ user }: { user: User }) {
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [recharges, setRecharges] = useState<any[]>([]);
   const [withdrawals, setWithdrawals] = useState<any[]>([]);
+  const [withdrawalStats, setWithdrawalStats] = useState({ totalAmount: 0, totalCount: 0 });
   const [loading, setLoading] = useState(true);
   const [resubmittingTask, setResubmittingTask] = useState<TaskItem | null>(null);
 
@@ -42,6 +43,20 @@ export function HistoryView({ user }: { user: User }) {
   const loadWithdrawals = async () => {
     setLoading(true);
     try {
+      // First fetch aggregate stats for approved withdrawals
+      const { data: statsData } = await supabase
+        .from('withdrawals')
+        .select('amount')
+        .eq('user_id', user.id)
+        .eq('status', 'approved');
+      
+      if (statsData) {
+        setWithdrawalStats({
+            totalAmount: statsData.reduce((acc, curr) => acc + Number(curr.amount), 0),
+            totalCount: statsData.length
+        });
+      }
+
       let query = supabase
         .from('withdrawals')
         .select('*')
@@ -200,6 +215,19 @@ export function HistoryView({ user }: { user: User }) {
           </button>
         ))}
       </div>
+
+      {activeTab === 'withdrawals' && (
+        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-4 mb-6 border border-indigo-100 shadow-sm flex items-center justify-between">
+          <div>
+            <p className="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-1">মোট উত্তোলন</p>
+            <p className="text-2xl font-black text-indigo-700 leading-none">৳{withdrawalStats.totalAmount}</p>
+          </div>
+          <div className="text-right">
+            <p className="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-1">সফল ট্রানজেকশন</p>
+            <p className="text-2xl font-black text-indigo-700 leading-none">{withdrawalStats.totalCount} বার</p>
+          </div>
+        </div>
+      )}
 
       {loading ? (
         <div className="text-center py-10 text-slate-500 font-medium animate-pulse">Loading history...</div>

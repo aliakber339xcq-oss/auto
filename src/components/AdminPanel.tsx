@@ -24,6 +24,7 @@ export function AdminPanel({ onBack }: { onBack: () => void }) {
   const [newNotification, setNewNotification] = useState({ userId: '', message: '' });
 
   const [tasks, setTasks] = useState<TaskItem[]>([]);
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [newTaskForm, setNewTaskForm] = useState({
     title: '',
     description: '',
@@ -350,26 +351,68 @@ export function AdminPanel({ onBack }: { onBack: () => void }) {
     setLoading(false);
   };
 
-  const addTask = async (e: React.FormEvent) => {
+  const saveTask = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { data, error } = await supabase.from('tasks').insert({
-      title: newTaskForm.title,
-      description: newTaskForm.description,
-      link: newTaskForm.link,
-      tutorial_url: newTaskForm.tutorial_url,
-      reward: Number(newTaskForm.reward),
-      task_type: newTaskForm.task_type
-    }).select();
-    
-    if (data && data[0]) {
-      setTasks([data[0], ...tasks]);
-      setNewTaskForm({...newTaskForm, title: '', description: '', link: '', tutorial_url: ''});
+    if (editingTaskId) {
+      const { data, error } = await supabase.from('tasks').update({
+        title: newTaskForm.title,
+        description: newTaskForm.description,
+        link: newTaskForm.link,
+        tutorial_url: newTaskForm.tutorial_url,
+        reward: Number(newTaskForm.reward),
+        task_type: newTaskForm.task_type
+      }).eq('id', editingTaskId).select();
+
+      if (data && data[0]) {
+        setTasks(tasks.map(t => t.id === editingTaskId ? data[0] : t));
+        setEditingTaskId(null);
+        setNewTaskForm({...newTaskForm, title: '', description: '', link: '', tutorial_url: ''});
+      }
+    } else {
+      const { data, error } = await supabase.from('tasks').insert({
+        title: newTaskForm.title,
+        description: newTaskForm.description,
+        link: newTaskForm.link,
+        tutorial_url: newTaskForm.tutorial_url,
+        reward: Number(newTaskForm.reward),
+        task_type: newTaskForm.task_type
+      }).select();
+      
+      if (data && data[0]) {
+        setTasks([data[0], ...tasks]);
+        setNewTaskForm({...newTaskForm, title: '', description: '', link: '', tutorial_url: ''});
+      }
     }
+  };
+
+  const startEditTask = (task: TaskItem) => {
+    setEditingTaskId(task.id);
+    setNewTaskForm({
+      title: task.title,
+      description: task.description || '',
+      link: task.link,
+      tutorial_url: task.tutorial_url || '',
+      reward: String(task.reward),
+      task_type: task.task_type
+    });
+    // Scroll to top to see the form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const cancelEdit = () => {
+    setEditingTaskId(null);
+    setNewTaskForm({ title: '', description: '', link: '', tutorial_url: '', reward: '5', task_type: 'fb-reels' });
   };
 
   const toggleTask = async (id: string, currentStatus: boolean) => {
     await supabase.from('tasks').update({ is_active: !currentStatus }).eq('id', id);
     setTasks(tasks.map(t => t.id === id ? { ...t, is_active: !currentStatus } : t));
+  };
+
+  const deleteTask = async (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this task?')) return;
+    await supabase.from('tasks').delete().eq('id', id);
+    setTasks(tasks.filter(t => t.id !== id));
   };
 
 
@@ -797,8 +840,13 @@ export function AdminPanel({ onBack }: { onBack: () => void }) {
         {tab === 'tasks' && (
           <div className="space-y-6">
             <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-              <h2 className="text-lg font-bold text-slate-800 mb-4">Add New Task</h2>
-              <form onSubmit={addTask} className="space-y-3">
+              <div className="flex items-center justify-between mb-4">
+                 <h2 className="text-lg font-bold text-slate-800">{editingTaskId ? 'Edit Task' : 'Add New Task'}</h2>
+                 {editingTaskId && (
+                    <button onClick={cancelEdit} className="text-sm font-bold text-slate-500 hover:text-slate-700">Cancel</button>
+                 )}
+              </div>
+              <form onSubmit={saveTask} className="space-y-3">
                 <div>
                   <label className="block text-xs font-medium text-slate-500 mb-1">Category</label>
                   <select 
@@ -831,8 +879,8 @@ export function AdminPanel({ onBack }: { onBack: () => void }) {
                   <label className="block text-xs font-medium text-slate-500 mb-1">Reward (BDT)</label>
                   <input required type="number" step="0.1" value={newTaskForm.reward} onChange={e => setNewTaskForm({...newTaskForm, reward: e.target.value})} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm" />
                 </div>
-                <button type="submit" className="w-full bg-slate-800 text-white py-2.5 rounded-lg flex justify-center items-center gap-2 hover:bg-slate-700">
-                  <Plus size={18} /> Add Task
+                <button type="submit" className={`w-full text-white py-2.5 rounded-lg flex justify-center items-center gap-2 transition-colors ${editingTaskId ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-slate-800 hover:bg-slate-700'}`}>
+                  {editingTaskId ? <Check size={18} /> : <Plus size={18} />} {editingTaskId ? 'Update Task' : 'Add Task'}
                 </button>
               </form>
             </div>
@@ -840,17 +888,31 @@ export function AdminPanel({ onBack }: { onBack: () => void }) {
             <div className="space-y-3">
               <h3 className="font-bold text-slate-800">Existing Tasks</h3>
               {tasks.map(t => (
-                <div key={t.id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex justify-between items-center">
+                <div key={t.id} className={`bg-white p-4 rounded-xl shadow-sm border flex justify-between items-center ${editingTaskId === t.id ? 'border-indigo-400 ring-2 ring-indigo-50' : 'border-slate-200'}`}>
                   <div>
                     <h4 className="font-bold text-slate-800 text-sm">{t.title}</h4>
                     <p className="text-xs text-slate-500">[{t.task_type}] - ৳{t.reward}</p>
                   </div>
-                  <button 
-                    onClick={() => toggleTask(t.id, t.is_active)}
-                    className={`px-3 py-1 text-xs font-medium rounded-full ${t.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600'}`}
-                  >
-                    {t.is_active ? 'Active' : 'Hidden'}
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button 
+                      onClick={() => toggleTask(t.id, t.is_active)}
+                      className={`px-3 py-1 text-xs font-medium rounded-full ${t.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600'}`}
+                    >
+                      {t.is_active ? 'Active' : 'Hidden'}
+                    </button>
+                    <button 
+                      onClick={() => startEditTask(t)}
+                      className="p-1 px-2 text-indigo-500 hover:bg-indigo-50 rounded-lg transition-colors"
+                    >
+                      Edit
+                    </button>
+                    <button 
+                      onClick={() => deleteTask(t.id)}
+                      className="p-1 px-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

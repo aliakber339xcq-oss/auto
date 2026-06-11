@@ -80,7 +80,7 @@ export function Dashboard({ user, onLogout, setUser }: DashboardProps) {
         const { data } = await supabase.from('site_settings').select('*').limit(1);
         if (data && data[0]) {
           setSiteSettings(data[0]);
-          if (data[0].popup_enabled && Math.random() < 0.25) {
+          if (data[0].popup_enabled && Math.random() < 0.75) {
             setShowPopup(true);
           }
         }
@@ -376,17 +376,17 @@ export function Dashboard({ user, onLogout, setUser }: DashboardProps) {
                 </div>
               </div>
 
-              <h2 className="text-2xl font-black text-slate-800 mb-2 tracking-tight relative z-10">Special Task!</h2>
+              <h2 className="text-2xl font-black text-slate-800 mb-2 tracking-tight relative z-10">স্পেশাল টাস্ক!</h2>
               <div className="text-sm text-slate-500 font-medium mb-8 leading-relaxed relative z-10 px-2">
-                A high-paying Special Task is waiting for you. Complete it now before it's gone!
+                একটি বেশি ইনকামের স্পেশাল টাস্ক আপনার জন্য অপেক্ষা করছে। সময় শেষ হওয়ার আগেই টাস্কটি সম্পন্ন করুন!
               </div>
               
               <div className="space-y-3 relative z-10">
                 <button onClick={() => { setShowSpecialTaskPopup(false); setActiveTaskCategory('special'); }} className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-4 rounded-2xl font-black shadow-lg shadow-purple-500/30 hover:shadow-purple-500/40 active:scale-[0.98] transition-all uppercase tracking-wide text-sm">
-                  View Special Tasks
+                  স্পেশাল টাস্ক দেখুন
                 </button>
                 <button onClick={() => setShowSpecialTaskPopup(false)} className="w-full bg-slate-50 text-slate-600 py-3 rounded-2xl font-bold hover:bg-slate-100 transition-colors">
-                  Maybe Later
+                  পরে দেখবো
                 </button>
               </div>
             </motion.div>
@@ -426,24 +426,24 @@ export function Dashboard({ user, onLogout, setUser }: DashboardProps) {
                   </div>
                 </div>
 
-                <h2 className="text-2xl font-black text-slate-800 mb-3 tracking-tight relative z-10">Welcome to BD Pay</h2>
+                <h2 className="text-2xl font-black text-slate-800 mb-3 tracking-tight relative z-10">বিডি পেতে স্বাগতম</h2>
                 <div className="text-sm text-slate-500 font-medium mb-8 leading-relaxed relative z-10 whitespace-pre-wrap px-2">
-                  {siteSettings.popup_text || "Thank you for joining our community. Start completing tasks to earn real rewards today!"}
+                  {siteSettings.popup_text || "আমাদের সাথে যুক্ত থাকার জন্য ধন্যবাদ। আজই টাস্ক সম্পূর্ণ করে ইনকাম শুরু করুন!"}
                 </div>
                 
                 <div className="space-y-3 relative z-10">
                   {siteSettings.tutorial_url && (
                      <button onClick={() => { setActiveTab('tutorial'); setShowPopup(false); }} className="w-full bg-slate-50 border border-slate-100 text-slate-700 py-3.5 rounded-2xl font-bold flex justify-center items-center gap-2 hover:bg-slate-100 transition-colors shadow-sm">
-                       Watch Tutorial <ChevronRight size={16} className="text-slate-400" />
+                       কিভাবে কাজ করবেন <ChevronRight size={16} className="text-slate-400" />
                      </button>
                   )}
                   {siteSettings.telegram_url && (
                      <a href={siteSettings.telegram_url} target="_blank" rel="noopener noreferrer" className="w-full bg-[#2AABEE]/10 text-[#2AABEE] py-3.5 rounded-2xl font-bold flex justify-center items-center gap-2 hover:bg-[#2AABEE]/20 transition-colors shadow-sm">
-                       Join Telegram Updates
+                       টেলিগ্রামে যুক্ত হোন
                      </a>
                   )}
                   <button onClick={() => setShowPopup(false)} className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-2xl font-black shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/40 active:scale-[0.98] transition-all uppercase tracking-wide text-sm mt-2">
-                    Let's Start
+                    শুরু করুন
                   </button>
                 </div>
               </motion.div>
@@ -679,7 +679,7 @@ export function Dashboard({ user, onLogout, setUser }: DashboardProps) {
                   </div>
 
                   {/* Daily Goal Progress Ring */}
-                  <div className="relative w-[68px] h-[68px] flex items-center justify-center shrink-0" title="Daily Goal: 100 Taka">
+                  <div className="relative w-[68px] h-[68px] flex items-center justify-center shrink-0" title="Daily Goal: 300 Taka">
                     <svg className="w-full h-full transform -rotate-90 drop-shadow-sm" viewBox="0 0 36 36">
                       <path
                         d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
@@ -689,7 +689,7 @@ export function Dashboard({ user, onLogout, setUser }: DashboardProps) {
                       />
                       <motion.path
                         initial={{ strokeDasharray: "0, 100" }}
-                        animate={{ strokeDasharray: `${Math.min((user.balance % 100 === 0 && user.balance > 0 ? 100 : user.balance % 100), 100)}, 100` }}
+                        animate={{ strokeDasharray: `${Math.min((user.balance / 300) * 100, 100)}, 100` }}
                         transition={{ duration: 1.5, ease: 'easeOut', delay: 0.2 }}
                         d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                         fill="none"
@@ -700,7 +700,7 @@ export function Dashboard({ user, onLogout, setUser }: DashboardProps) {
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center mt-0.5">
                       <span className="text-[9px] font-black tracking-wider uppercase text-slate-400">Goal</span>
-                      <span className="text-xs font-bold text-slate-700 leading-none mt-0.5">{Math.floor(user.balance % 100 === 0 && user.balance > 0 ? 100 : user.balance % 100)}%</span>
+                      <span className="text-xs font-bold text-slate-700 leading-none mt-0.5">{Math.min(Math.floor((user.balance / 300) * 100), 100)}%</span>
                     </div>
                   </div>
                 </div>

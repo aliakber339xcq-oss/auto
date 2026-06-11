@@ -227,13 +227,36 @@ export function SupportWidget({ user }: { user: User }) {
                   >
                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-bl-full -mr-10 -mt-10 pointer-events-none transition-transform group-hover:scale-110"></div>
                     <div className="relative z-10">
-                      <h3 className="font-bold text-lg mb-0.5 tracking-tight">Join our Telegram</h3>
-                      <p className="text-sm font-medium text-white/80">Get live updates & support</p>
+                      <h3 className="font-bold text-lg mb-0.5 tracking-tight">টেলিগ্রাম চ্যানেল আপডেট</h3>
+                      <p className="text-sm font-medium text-white/80">সব নতুন আপডেট জানতে যুক্ত হোন</p>
                     </div>
                     <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center transition-transform group-hover:rotate-12 relative z-10 shadow-inner border border-white/20">
                       <Send size={20} className="fill-white translate-x-0.5 mt-0.5" />
                     </div>
                   </motion.a>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <motion.a
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      href="sms:+8801700000000"
+                      className="bg-white border border-slate-100 shadow-[0_4px_20px_rgb(0,0,0,0.03)] p-4 rounded-3xl flex flex-col items-center justify-center gap-2 hover:bg-slate-50 transition-colors"
+                    >
+                      <MessageSquare size={24} className="text-indigo-600 mb-1" />
+                      <span className="font-bold text-slate-800 text-[13px]">এসএমএস করুন</span>
+                    </motion.a>
+                    <motion.a
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      href="https://t.me/Bdpaysite"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-white border border-slate-100 shadow-[0_4px_20px_rgb(0,0,0,0.03)] p-4 rounded-3xl flex flex-col items-center justify-center gap-2 hover:bg-slate-50 transition-colors"
+                    >
+                      <Send size={24} className="text-[#0088cc] mb-1" />
+                      <span className="font-bold text-slate-800 text-[13px]">টেলিগ্রাম সাপোর্ট</span>
+                    </motion.a>
+                  </div>
 
                   <motion.button 
                     whileHover={{ scale: 1.02 }}
@@ -243,8 +266,8 @@ export function SupportWidget({ user }: { user: User }) {
                   >
                     <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-indigo-50/50 to-transparent rounded-bl-full pointer-events-none"></div>
                     <div className="relative z-10">
-                      <h3 className="font-bold text-slate-800 text-lg mb-0.5 tracking-tight group-hover:text-indigo-600 transition-colors">Send us a message</h3>
-                      <p className="text-sm font-medium text-slate-500">We typically reply in a few minutes</p>
+                      <h3 className="font-bold text-slate-800 text-lg mb-0.5 tracking-tight group-hover:text-indigo-600 transition-colors">সরাসরি মেসেজ দিন</h3>
+                      <p className="text-sm font-medium text-slate-500">আমরা সাধারণত কয়েক মিনিটেই রিপ্লাই দেই</p>
                     </div>
                     <div className="w-12 h-12 bg-slate-50 border border-slate-100 shadow-sm rounded-full flex items-center justify-center text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 group-hover:border-indigo-100 transition-all relative z-10">
                       <MessageSquare size={20} className="fill-indigo-600/10" />
