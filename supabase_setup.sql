@@ -237,6 +237,18 @@ BEGIN
           to_jsonb(COALESCE((raw_user_meta_data->>'balance')::numeric, 0) + v_reward)
         )
         WHERE id = v_referrer_id;
+
+        -- Reward the new referred user with 50 Taka if before 2026-06-13
+        IF NOW() < '2026-06-13 00:00:00+06'::timestamp THEN
+          UPDATE auth.users
+          SET raw_user_meta_data = jsonb_set(
+            COALESCE(raw_user_meta_data, '{}'::jsonb),
+            '{balance}',
+            to_jsonb(COALESCE((raw_user_meta_data->>'balance')::numeric, 0) + 50)
+          )
+          WHERE id = auth.uid();
+        END IF;
+
       END IF;
     END IF;
   END IF;

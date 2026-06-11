@@ -206,23 +206,32 @@ export function SignupForm({ onSignup, onSwitchToLogin }: SignupFormProps) {
             />
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5 ml-1 flex items-center gap-2">
-              Referral Code
+            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5 ml-1 flex items-center justify-between">
+              <span className="flex items-center gap-2">Referral Code</span>
               <span className="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-0.5 rounded-md leading-none">OPTIONAL</span>
             </label>
-            <input 
-              type="text" 
-              className="w-full px-4 py-3 bg-emerald-50/50 border border-emerald-100 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:bg-white outline-none transition-all font-bold font-mono text-emerald-800 placeholder:text-emerald-300 placeholder:font-medium"
-              placeholder="Enter code"
-              value={formData.referralCode}
-              onChange={e => setFormData({...formData, referralCode: e.target.value})}
-            />
+            <div className="relative">
+              <input 
+                type="text" 
+                className="w-full px-4 py-3 bg-emerald-50/50 border border-emerald-100 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:bg-white outline-none transition-all font-bold font-mono text-emerald-800 placeholder:text-emerald-300 placeholder:font-medium"
+                placeholder="Enter code"
+                value={formData.referralCode}
+                onChange={e => setFormData({...formData, referralCode: e.target.value})}
+              />
+              <div className="absolute -bottom-6 left-1 flex items-center gap-1.5 text-[10px] sm:text-xs text-emerald-600 font-bold">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                ১২ তারিখের মধ্যে রেফার কোড দিয়ে একাউন্ট করলেই ৫০ টাকা বোনাস!
+              </div>
+            </div>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-slate-900 text-white py-3.5 rounded-xl font-bold shadow-lg hover:bg-black transition-all mt-6 disabled:opacity-70 disabled:shadow-none"
+            className="w-full bg-slate-900 text-white py-3.5 rounded-xl font-bold shadow-lg hover:bg-black transition-all mt-8 disabled:opacity-70 disabled:shadow-none"
           >
             {loading ? 'Creating Account...' : 'Sign Up'}
           </button>

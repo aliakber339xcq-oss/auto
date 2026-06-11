@@ -104,7 +104,13 @@ export function ReferralView({ user, onBack }: { user: User, onBack: () => void 
            <h2 className="text-4xl font-black mb-2 flex justify-center items-center gap-2">
              ৳১৫ <span className="text-lg font-bold text-indigo-200 uppercase tracking-widest bg-white/10 px-3 py-1 rounded-xl">প্রতি রেফারে</span>
            </h2>
-           <p className="text-indigo-100/80 text-sm font-medium mt-3 px-4 leading-relaxed">আপনার কোড শেয়ার করুন এবং বন্ধুদের জয়েন করিয়ে লাইফটাইম বোনাস পান!</p>
+           <p className="text-indigo-100/80 text-sm font-medium mt-3 px-4 leading-relaxed">আপনার কোড শেয়ার করুন এবং বন্ধুদের জয়েন করিয়ে লাইফটাইম সুযোগ পান!</p>
+
+           <div className="mt-5 bg-amber-400/20 border border-amber-400/30 p-3 rounded-xl backdrop-blur-sm mx-2">
+             <p className="text-amber-100 text-xs font-bold leading-tight">
+               🎉 অফার: ১২ তারিখের মধ্যে আপনার কোড দিয়ে কেউ একাউন্ট করলেই সে পাবে <span className="text-amber-300 font-black">৳৫০ বোনাস!</span>
+             </p>
+           </div>
         </div>
       </div>
 
