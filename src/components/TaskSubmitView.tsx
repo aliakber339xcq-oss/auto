@@ -58,7 +58,7 @@ export function TaskSubmitView({ task, user, onBack, onSuccess }: { task: TaskIt
           }
         } catch(e) {
           console.error('Imgbb upload failed with key', k.api_key);
-          await supabase.from('imgbb_keys').update({ is_active: false }).eq('id', k.id);
+          await supabase.from('imgbb_keys').delete().eq('id', k.id);
         }
       }
       
