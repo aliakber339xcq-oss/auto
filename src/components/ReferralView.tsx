@@ -108,7 +108,7 @@ export function ReferralView({ user, onBack }: { user: User, onBack: () => void 
 
            <div className="mt-5 bg-amber-400/20 border border-amber-400/30 p-3 rounded-xl backdrop-blur-sm mx-2">
              <p className="text-amber-100 text-xs font-bold leading-tight">
-               🎉 অফার: ১২ তারিখের মধ্যে আপনার কোড দিয়ে কেউ একাউন্ট করলেই সে পাবে <span className="text-amber-300 font-black">৳৫০ বোনাস!</span>
+               🎉 অফার: 20 তারিখের মধ্যে আপনার কোড দিয়ে কেউ একাউন্ট করলেই সে পাবে <span className="text-amber-300 font-black">৳৫০ বোনাস!</span>
              </p>
            </div>
         </div>
