@@ -363,7 +363,7 @@ export function AdminPanel({ onBack }: { onBack: () => void }) {
   };
 
   const deleteKey = async (id: string) => {
-    await supabase.from('imgbb_keys').update({ is_active: false }).eq('id', id);
+    await supabase.from('imgbb_keys').delete().eq('id', id);
     setKeys(keys.filter(k => k.id !== id));
   };
 
