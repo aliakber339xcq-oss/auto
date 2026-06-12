@@ -587,21 +587,21 @@ export function Dashboard({ user, onLogout, setUser }: DashboardProps) {
             )}
             
             {/* Home Profile Section */}
-            <div className={`bg-gradient-to-b from-primary to-indigo-700 ${!siteSettings?.global_notice ? 'pt-6' : 'pt-4'} pb-24 px-6 rounded-b-[2.5rem] shadow-lg relative overflow-hidden`}>
+            <div className={`bg-gradient-to-b from-primary to-indigo-700 ${!siteSettings?.global_notice ? 'pt-4' : 'pt-2'} pb-16 px-5 rounded-b-[2rem] shadow-lg relative overflow-hidden`}>
               <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
               <div className="absolute bottom-0 left-0 w-48 h-48 bg-black/10 rounded-full blur-2xl -ml-10 -mb-10"></div>
               
               <div className="max-w-md mx-auto text-white relative z-10">
-                <p className="text-indigo-100 text-sm font-medium mb-1 tracking-wide uppercase">Welcome back</p>
+                <p className="text-indigo-100 text-xs font-medium mb-0.5 tracking-wide uppercase">Welcome back</p>
                 <div className="flex items-center">
-                  <h2 className="text-3xl font-black tracking-tight">{user.name}</h2>
+                  <h2 className="text-2xl font-black tracking-tight">{user.name}</h2>
                   {!canCheckIn && (
                     <motion.div 
                       initial={{ scale: 0, opacity: 0 }} 
                       animate={{ scale: 1, opacity: 1 }} 
-                      className="flex items-center gap-1.5 bg-orange-500/20 px-3 py-1 rounded-full text-orange-300 text-xs font-bold ml-4 border border-orange-400/30 backdrop-blur-sm"
+                      className="flex items-center gap-1.5 bg-orange-500/20 px-3 py-1 rounded-full text-orange-300 text-[10px] font-bold ml-3 border border-orange-400/30 backdrop-blur-sm"
                     >
-                      <Flame size={14} className="fill-orange-400 stroke-orange-400" />
+                      <Flame size={12} className="fill-orange-400 stroke-orange-400" />
                       {user.streak} Days
                     </motion.div>
                   )}
@@ -609,25 +609,25 @@ export function Dashboard({ user, onLogout, setUser }: DashboardProps) {
               </div>
             </div>
 
-            <div className="max-w-md mx-auto px-4 -mt-14 relative space-y-5 z-20">
+            <div className="max-w-md mx-auto px-4 -mt-10 relative space-y-3 z-20">
               {/* Balance Card */}
               <motion.div 
                 initial={{ y: 20, opacity: 0 }} 
                 animate={{ y: 0, opacity: 1 }}
-                className="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] p-6 flex flex-col sm:flex-row items-center justify-between border border-white/40 ring-1 ring-slate-100/50 backdrop-blur-xl relative overflow-hidden"
+                className="bg-white rounded-2xl shadow-[0_8px_20px_rgb(0,0,0,0.06)] p-4 flex items-center justify-between border border-white/40 ring-1 ring-slate-100/50 backdrop-blur-xl relative overflow-hidden"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/50 to-transparent pointer-events-none" />
-                <div className="flex items-center gap-5 w-full relative z-10">
-                  <div className="w-16 h-16 bg-gradient-to-br from-emerald-100 to-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center shadow-inner border border-emerald-100/50">
-                    <Wallet size={32} strokeWidth={1.5} />
+                <div className="flex items-center gap-3 w-full relative z-10">
+                  <div className="w-12 h-12 bg-gradient-to-br from-emerald-100 to-emerald-50 text-emerald-600 rounded-[14px] shrink-0 flex items-center justify-center shadow-inner border border-emerald-100/50">
+                    <Wallet size={24} strokeWidth={1.5} />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm text-slate-500 font-bold tracking-wide uppercase mb-1">Main Balance</p>
-                    <p className="text-3xl font-black text-slate-800 tracking-tight">৳ {user.balance.toFixed(2)}</p>
+                    <p className="text-[11px] text-slate-500 font-bold tracking-wide uppercase mb-0.5">Main Balance</p>
+                    <p className="text-2xl font-black text-slate-800 tracking-tight leading-none">৳ {user.balance.toFixed(2)}</p>
                   </div>
 
                   {/* Daily Goal Progress Ring */}
-                  <div className="relative w-[68px] h-[68px] flex items-center justify-center shrink-0" title="Daily Goal: 300 Taka">
+                  <div className="relative w-[52px] h-[52px] flex shrink-0 items-center justify-center border border-slate-50 rounded-full" title="Daily Goal: 300 Taka">
                     <svg className="w-full h-full transform -rotate-90 drop-shadow-sm" viewBox="0 0 36 36">
                       <path
                         d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
@@ -646,9 +646,9 @@ export function Dashboard({ user, onLogout, setUser }: DashboardProps) {
                         strokeLinecap="round"
                       />
                     </svg>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center mt-0.5">
-                      <span className="text-[9px] font-black tracking-wider uppercase text-slate-400">Goal</span>
-                      <span className="text-xs font-bold text-slate-700 leading-none mt-0.5">{Math.min(Math.floor((user.balance / 300) * 100), 100)}%</span>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="text-[8px] font-black tracking-wider uppercase text-slate-400">Goal</span>
+                      <span className="text-[10px] font-bold text-slate-700 leading-none mt-[1px]">{Math.min(Math.floor((user.balance / 300) * 100), 100)}%</span>
                     </div>
                   </div>
                 </div>
@@ -660,27 +660,25 @@ export function Dashboard({ user, onLogout, setUser }: DashboardProps) {
                   initial={{ y: 20, opacity: 0 }} 
                   animate={{ y: 0, opacity: 1 }} 
                   transition={{ delay: 0.1 }}
-                  className="bg-white rounded-3xl shadow-md border border-slate-100 p-6 flex flex-col sm:flex-row gap-5 items-center justify-between"
+                  className="bg-white rounded-2xl shadow-sm border border-slate-100 p-3 flex gap-3 items-center justify-between"
                 >
-                  <div className="flex items-center gap-4 w-full sm:w-auto">
-                    <div className="w-12 h-12 bg-gradient-to-br from-orange-100 to-amber-50 text-orange-500 rounded-2xl flex items-center justify-center shadow-inner">
-                      <Flame size={24} fill="#f97316" />
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 shrink-0 bg-gradient-to-br from-orange-100 to-amber-50 text-orange-500 rounded-[12px] flex items-center justify-center shadow-inner">
+                      <Flame size={20} fill="#f97316" />
                     </div>
-                    <div className="flex-1">
-                      <p className="text-xs font-bold tracking-wider uppercase text-slate-400 mb-0.5">Daily Check-In</p>
-                      <p className="font-black text-slate-800 text-lg">{user.streak} / 7 Days</p>
+                    <div>
+                      <p className="text-[10px] font-bold tracking-wider uppercase text-slate-400 mb-0.5">Daily Check-In</p>
+                      <p className="font-black text-slate-800 text-sm">{user.streak} / 7 Days</p>
                     </div>
                   </div>
                   
-                  <div className="w-full sm:w-auto">
-                    <button
-                      onClick={handleCheckIn}
-                      disabled={isUpdating}
-                      className="w-full sm:w-auto px-8 py-3.5 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all bg-slate-900 text-white hover:bg-black shadow-[0_4px_14px_0_rgb(0,0,0,0.2)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.23)] hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:shadow-none"
-                    >
-                      {isUpdating ? 'আপডেট হচ্ছে...' : 'রিওয়ার্ড ক্লেইম করুন'}
-                    </button>
-                  </div>
+                  <button
+                    onClick={handleCheckIn}
+                    disabled={isUpdating}
+                    className="px-4 py-2 shrink-0 rounded-xl text-[11px] font-bold transition-all bg-slate-900 text-white hover:bg-black shadow-[0_4px_10px_0_rgb(0,0,0,0.15)] disabled:opacity-70"
+                  >
+                    {isUpdating ? 'Wait...' : 'Claim Reward'}
+                  </button>
                 </motion.div>
               )}
               
@@ -717,30 +715,60 @@ export function Dashboard({ user, onLogout, setUser }: DashboardProps) {
                 </motion.div>
               )}
 
+              {/* Tasks Grid */}
+              <div className="pt-0">
+                <div className="flex items-center justify-between mb-3 px-1">
+                  <h2 className="text-xl font-black text-slate-800">Earning Options</h2>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {regularTasks.map((task, idx) => (
+                    <motion.button
+                      key={task.id}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.2 + (idx * 0.05) }}
+                      onClick={() => startTask(task.id, task.title)}
+                      className="bg-white p-3.5 rounded-[1.2rem] shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] border border-slate-100 flex flex-col items-start gap-3 hover:shadow-md hover:border-slate-200 transition-all text-left group relative overflow-hidden"
+                    >
+                      <div className="absolute -right-4 -top-4 w-20 h-20 bg-slate-50/80 rounded-full group-hover:scale-[2] transition-transform duration-700 ease-in-out z-0 opacity-50" />
+                      <div className={`relative z-10 w-10 h-10 rounded-xl flex items-center justify-center ${task.bg.replace('bg-', 'bg-opacity-80 bg-')} ${task.color} shadow-sm border border-white/60`}>
+                        <task.icon size={20} strokeWidth={2.5} />
+                      </div>
+                      <div className="relative z-10 w-full mt-1">
+                        <span className="font-extrabold text-[12px] text-slate-800 leading-snug group-hover:text-primary transition-colors flex items-center justify-between">
+                          {task.title}
+                          {taskCounts[task.id] !== undefined && (
+                            <span className="bg-indigo-50 text-indigo-600 text-[9px] px-1.5 py-0.5 rounded font-black border border-indigo-100/50">
+                              {taskCounts[task.id]}
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
+
               {/* Highlighted Tasks */}
-              <div className="space-y-4 pt-2">
+              <div className="grid grid-cols-2 gap-3 pt-2">
                 {specialTask && taskCounts[specialTask.id] > 0 && (
                   <motion.button
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     onClick={() => startTask(specialTask.id, specialTask.title)}
-                    className="w-full bg-gradient-to-r from-pink-500 to-rose-500 p-1.5 rounded-[1.5rem] shadow-xl shadow-rose-500/20 text-left group transition-all hover:shadow-2xl hover:shadow-rose-500/30 hover:-translate-y-0.5"
+                    className="w-full bg-gradient-to-br from-rose-50 to-pink-50 p-3 rounded-[1.2rem] shadow-sm border border-rose-100 text-left group transition-all hover:shadow-md hover:border-rose-200"
                   >
-                    <div className="bg-white/95 backdrop-blur-xl rounded-[1.2rem] p-5 flex items-center justify-between h-full border border-white/50">
-                      <div className="flex items-center gap-5">
-                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${specialTask.bg} ${specialTask.color} shadow-inner`}>
-                          <specialTask.icon size={28} />
+                    <div className="flex flex-col gap-2">
+                      <div className="flex justify-between items-start">
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center bg-rose-100 text-rose-600 shadow-sm border border-white`}>
+                          <specialTask.icon size={16} />
                         </div>
-                        <div>
-                          <div className="flex items-center gap-2 mb-1.5">
-                            <span className="inline-block px-2.5 py-1 bg-rose-50 text-rose-700 text-[10px] font-black rounded-lg tracking-wider uppercase border border-rose-100">Hot</span>
-                            <span className="inline-block px-2.5 py-1 bg-amber-50 text-amber-700 text-[10px] font-black rounded-lg tracking-wider uppercase border border-amber-100">{taskCounts[specialTask.id]} Tasks Available</span>
-                          </div>
-                          <h3 className="font-black text-slate-800 text-xl leading-tight group-hover:text-rose-600 transition-colors">{specialTask.title}</h3>
-                          <p className="text-xs text-slate-500 mt-1 font-semibold">High earning special tasks!</p>
-                        </div>
+                        <span className="inline-block px-1.5 py-0.5 bg-rose-100 text-rose-700 text-[8px] font-black rounded uppercase border border-rose-200">Hot</span>
                       </div>
-                      <ChevronRight size={24} className="text-rose-400 opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                      <div>
+                        <h3 className="font-extrabold text-slate-800 text-[12px] leading-tight group-hover:text-rose-600 transition-colors">{specialTask.title}</h3>
+                        <p className="text-[9px] text-slate-500 mt-0.5 font-bold">{taskCounts[specialTask.id]} Available</p>
+                      </div>
                     </div>
                   </motion.button>
                 )}
@@ -750,63 +778,22 @@ export function Dashboard({ user, onLogout, setUser }: DashboardProps) {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     onClick={() => startTask(rechargeTask.id, rechargeTask.title)}
-                    className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 p-1.5 rounded-[1.5rem] shadow-xl shadow-indigo-500/20 text-left group transition-all hover:shadow-2xl hover:shadow-indigo-500/30 hover:-translate-y-0.5"
+                    className="w-full bg-gradient-to-br from-indigo-50 to-purple-50 p-3 rounded-[1.2rem] shadow-sm border border-indigo-100 text-left group transition-all hover:shadow-md hover:border-indigo-200"
                   >
-                    <div className="bg-white/95 backdrop-blur-xl rounded-[1.2rem] p-5 flex items-center justify-between h-full border border-white/50">
-                      <div className="flex items-center gap-5">
-                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${rechargeTask.bg} ${rechargeTask.color} shadow-inner`}>
-                          <rechargeTask.icon size={28} />
+                    <div className="flex flex-col gap-2">
+                      <div className="flex justify-between items-start">
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center bg-indigo-100 text-indigo-600 shadow-sm border border-white`}>
+                          <rechargeTask.icon size={16} />
                         </div>
-                        <div>
-                          <div className="flex items-center gap-2 mb-1.5">
-                            <span className="inline-block px-2.5 py-1 bg-indigo-50 text-indigo-700 text-[10px] font-black rounded-lg tracking-wider uppercase border border-indigo-100">Top Up</span>
-                            <span className="inline-block px-2.5 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-black rounded-lg tracking-wider uppercase border border-emerald-100">56৳/1000৳ Com</span>
-                          </div>
-                          <h3 className="font-black text-slate-800 text-xl leading-tight group-hover:text-indigo-600 transition-colors">{rechargeTask.title}</h3>
-                          <p className="text-xs text-slate-500 mt-1 font-semibold">Enjoy awesome offers & cheap data packs</p>
-                        </div>
+                        <span className="inline-block px-1.5 py-0.5 bg-indigo-100 text-indigo-700 text-[8px] font-black rounded uppercase border border-indigo-200">Earn</span>
                       </div>
-                      <ChevronRight size={24} className="text-indigo-400 opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                      <div>
+                        <h3 className="font-extrabold text-slate-800 text-[12px] leading-tight group-hover:text-indigo-600 transition-colors">{rechargeTask.title}</h3>
+                        <p className="text-[9px] text-slate-500 mt-0.5 font-bold">56৳/1000৳ Com</p>
+                      </div>
                     </div>
                   </motion.button>
                 )}
-              </div>
-
-              {/* Tasks Grid */}
-              <div className="pt-2">
-                <div className="flex items-center justify-between mb-4 px-1">
-                  <h2 className="text-xl font-black text-slate-800">Earning Options</h2>
-                </div>
-                <div className="grid grid-cols-2 gap-3.5">
-                  {regularTasks.map((task, idx) => (
-                    <motion.button
-                      key={task.id}
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.2 + (idx * 0.05) }}
-                      onClick={() => startTask(task.id, task.title)}
-                      className="bg-white p-5 rounded-3xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] border border-slate-100/60 flex flex-col items-start gap-4 hover:shadow-lg hover:border-slate-200 transition-all text-left group relative overflow-hidden"
-                    >
-                      <div className="absolute -right-6 -top-6 w-24 h-24 bg-slate-50 rounded-full group-hover:scale-[2] transition-transform duration-700 ease-in-out z-0 opacity-50" />
-                      <div className={`relative z-10 w-12 h-12 rounded-2xl flex items-center justify-center ${task.bg} ${task.color} shadow-inner`}>
-                        <task.icon size={24} />
-                      </div>
-                      <div className="relative z-10 w-full mt-2">
-                        <span className="font-bold text-[14px] text-slate-800 leading-snug group-hover:text-primary transition-colors flex items-center justify-between">
-                          {task.title}
-                          {taskCounts[task.id] !== undefined && (
-                            <span className="bg-indigo-100 text-indigo-700 text-[10px] px-1.5 py-0.5 rounded-md font-bold">
-                              {taskCounts[task.id]}
-                            </span>
-                          )}
-                        </span>
-                        <div className="hidden group-hover:flex items-center gap-1 mt-2 text-primary font-semibold text-[11px] opacity-0 group-hover:opacity-100 transition-opacity">
-                          Start <ChevronRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
-                        </div>
-                      </div>
-                    </motion.button>
-                  ))}
-                </div>
               </div>
 
               {/* Premium Task (Moved below regular tasks) */}
@@ -1032,4 +1019,3 @@ export function Dashboard({ user, onLogout, setUser }: DashboardProps) {
     </div>
   );
 }
-
